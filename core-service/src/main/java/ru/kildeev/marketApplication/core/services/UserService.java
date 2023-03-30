@@ -9,11 +9,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kildeev.marketApplication.core.api.ProductDto;
+import ru.kildeev.marketApplication.core.api.UserDto;
 import ru.kildeev.marketApplication.core.converters.ProductConverter;
+import ru.kildeev.marketApplication.core.converters.UserConverter;
 import ru.kildeev.marketApplication.core.entities.Order;
 import ru.kildeev.marketApplication.core.entities.Product;
 import ru.kildeev.marketApplication.core.entities.Role;
 import ru.kildeev.marketApplication.core.entities.User;
+import ru.kildeev.marketApplication.core.exceptions.ResourceNotFoundException;
 import ru.kildeev.marketApplication.core.repositories.ProductRepository;
 import ru.kildeev.marketApplication.core.repositories.RoleRepository;
 import ru.kildeev.marketApplication.core.repositories.UserRepository;
@@ -37,6 +40,8 @@ public class UserService implements UserDetailsService {
     private final ProductService productService;
 
     private final ProductRepository productRepository;
+
+    private final UserConverter userConverter;
 
     public boolean checkAccess(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
@@ -115,8 +120,9 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream().map(user -> userConverter.entityToDto(user))
+                .collect(Collectors.toList());
     }
 
     public Optional<User> getByUsername(String username) {
@@ -132,5 +138,15 @@ public class UserService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> mapRoleToAuthorities(Collection<Role> roles){
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getTitle())).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void expandUserAccess(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
+        Role admin = roleRepository.findByTitle("ROLE_ADMIN");
+        List<Role> roles = user.getRoles();
+        roles.add(admin);
+        user.setRoles(roles);
+        userRepository.save(user);
     }
 }

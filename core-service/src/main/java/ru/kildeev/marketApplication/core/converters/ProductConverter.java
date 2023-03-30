@@ -2,9 +2,15 @@ package ru.kildeev.marketApplication.core.converters;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.kildeev.marketApplication.core.api.CommentDto;
+import ru.kildeev.marketApplication.core.api.HashtagDto;
 import ru.kildeev.marketApplication.core.api.ProductDto;
+import ru.kildeev.marketApplication.core.entities.Comment;
+import ru.kildeev.marketApplication.core.entities.Hashtag;
 import ru.kildeev.marketApplication.core.entities.Product;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -15,16 +21,25 @@ public class ProductConverter {
     private final HashtagConverter hashtagConverter;
 
     public ProductDto entityToDto(Product product) {
+
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
         productDto.setTitle(product.getTitle());
         productDto.setCompany(product.getCompany().getTitle());
         productDto.setPrice(product.getPrice());
         productDto.setRemains(product.getRemains());
-        productDto.setDiscount(product.getDiscount().getAmount().toString());
-        productDto.setComments(product.getComments().stream().map(comment -> commentConverter.entityToDto(comment)).collect(Collectors.toList()));
-        productDto.setHashtags(product.getHashtags().stream().map(hashtag -> hashtagConverter.entityToDto(hashtag)).collect(Collectors.toList()));
 
+        if (product.getDiscount() != null) {
+            productDto.setDiscount(product.getDiscount().getAmount().toString());
+        }
+
+        List<CommentDto> comments = product.getComments().stream().map(commentConverter::entityToDto)
+                .collect(Collectors.toList());
+        productDto.setComments(comments);
+        List<HashtagDto> hashtags = product.getHashtags().stream().map(hashtagConverter::entityToDto)
+                .collect(Collectors.toList());
+
+        productDto.setHashtags(hashtags);
         productDto.setSpecifications(product.getSpecifications());
         return productDto;
     }

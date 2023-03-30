@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 
 @Entity
@@ -47,7 +48,7 @@ public class Product {
     private Company company;
 
     @ManyToOne
-    @JoinColumn(name = "discount_id")
+    @JoinColumn(name = "discount_id", nullable = true)
     private Discount discount;
 
 }

@@ -2,8 +2,8 @@
 create table users
 (
 
-    id              bigserial primary key ,
-    username        varchar(32),
+    id              bigserial primary key,
+    username        varchar(32) unique,
     email           varchar(32),
     password        varchar(100),
     balance         numeric(8, 2),
@@ -97,25 +97,45 @@ values (1, 1),
        (1, 2),
        (3, 1);
 
-insert into comments (comment_text, score)
-values ('perfect', 5),
-       ('good', 4),
-       ('not bad', 3);
-
 insert into companies (title, logo, user_id)
 values ('x5group', '5', 1),
        ('magnit', 'mag', 2),
        ('diksi', 'xXx', 3);
 
 insert into discounts (amount)
-values (5),
+values (0),
        (10),
        (25);
 
 insert into products (title, price, remains, specifications, score, company_id, discount_id)
 values ('bread', 40.50, 20,'10x5x2', 5, 1, 1),
        ('milk', 80.70, 50, '20x10x10', 5, 2, 2),
-       ('choco', 100.20, 10, '5x5x2', 4, 3, 3);
+       ('choco', 100.20, 10, '5x5x2', 4, 3, 3),
+       ('apples', 120.20, 50, '10x10x10', 4, 3, null);
+
+insert into comments (comment_text, score, user_id, product_id)
+values ('perfect', 5, 1, 2),
+       ('good', 4, 1, 1),
+       ('not bad', 3, 1, 1);
+
+insert into hashtags(title)
+values ('food'),
+       ('milk product'),
+       ('vegetables');
+
+insert into products_hashtags (product_id, hashtag_id)
+values (1, 1),
+       (2, 1),
+       (2, 2),
+       (3, 1),
+       (4, 1),
+       (4, 3);
+
+
+
+
+
+
 
 
 

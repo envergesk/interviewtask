@@ -25,5 +25,9 @@ public class OrderService {
         return orderRepository.findByUsername(username).stream().map(order -> orderConverter.entityToDto(order)).collect(Collectors.toList());
     }
 
+    public List<OrderDto> getById(Long id) {
+        return orderRepository.findById(id).stream().map(order -> orderConverter.entityToDto(order)).collect(Collectors.toList());
+    }
+
 
 }

@@ -19,6 +19,7 @@ public class ProductController {
 
     @GetMapping
     public List<ProductDto> getAllProducts() {
+        System.out.println(productService.getAll());
         return productService.getAll();
     }
 
@@ -27,10 +28,16 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping("/change_product")
+    @PostMapping("/change/product_info")
     @ResponseStatus(HttpStatus.OK)
     public void changeProductInfo(@RequestBody ProductDto productDto) {
         productService.changeProduct(productDto);
+    }
+
+    @GetMapping("/change/{id}/product_discount")
+    @ResponseStatus(HttpStatus.OK)
+    public void changeProductDiscount(@PathVariable Long id, @RequestParam Integer discount) {
+        productService.changeProductDiscount(id, discount);
     }
 
     @GetMapping("/{id}/buy")

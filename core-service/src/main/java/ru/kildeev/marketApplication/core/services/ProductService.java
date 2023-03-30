@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kildeev.marketApplication.core.api.ProductDto;
 import ru.kildeev.marketApplication.core.converters.ProductConverter;
+import ru.kildeev.marketApplication.core.entities.Discount;
 import ru.kildeev.marketApplication.core.entities.Order;
 import ru.kildeev.marketApplication.core.entities.Product;
 import ru.kildeev.marketApplication.core.exceptions.ResourceNotFoundException;
@@ -23,6 +24,8 @@ public class ProductService {
 
     private final OrderService orderService;
 
+    private final DiscountService discountService;
+
     public void saveProduct(Product product) {
         productRepository.save(product);
     }
@@ -32,6 +35,7 @@ public class ProductService {
     }
 
     public List<ProductDto> getAll() {
+//        return productRepository.fetchAll().stream().map(p -> productConverter.entityToDto(p)).collect(Collectors.toList());
         return productRepository.findAll().stream().map(product -> productConverter.entityToDto(product)).collect(Collectors.toList());
     }
 
@@ -46,5 +50,12 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Продукт не найден"));
         Order order = new Order(null, username, product.getTitle(), product.getDiscount().getAmount(), product.getPrice());
         orderService.saveOrder(order);
+    }
+
+    public void changeProductDiscount(Long id, Integer discountAmount) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Продукт не найден"));
+        Discount discount = discountService.getByAmount(discountAmount);
+        product.setDiscount(discount);
+        productRepository.save(product);
     }
 }
